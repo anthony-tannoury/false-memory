@@ -11,8 +11,8 @@ test. Paper result (Table 2): the missing word of a studied list is called
 Run:  python false_memory.py        (add --dev for a windowed test run)
 The first screen asks for the language: French, or English (the paper's lists).
 
-The word lists, the texts and the durations are in docs/false_memory/material.json.
-The web page docs/false_memory/index.html reads the same file and follows the
+The word lists, the texts and the durations are in docs/material.json.
+The web page docs/index.html reads the same file and follows the
 same steps, so both versions show the same thing.
 
 From the paper: 15 words per list in the appendix order, about 1.5 s per word;
@@ -40,7 +40,7 @@ from pathlib import Path
 
 from expyriment import control, design, misc, stimuli
 
-M = json.loads((Path(__file__).parent / "docs/false_memory/material.json").read_text("utf-8"))
+M = json.loads((Path(__file__).parent / "docs/material.json").read_text("utf-8"))
 OLD, NEW = misc.constants.K_f, misc.constants.K_j
 LANGUAGE_KEYS = {misc.constants.K_f: "fr", misc.constants.K_e: "en"}
 
