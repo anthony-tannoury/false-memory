@@ -16,6 +16,7 @@
   #text { position: absolute; top: 20%; width: 100%; white-space: pre-line; }
   .word { font-size: calc(100vh / 12); }
   a { color: inherit; }
+  [hidden] { display: none !important; }    /* #line is a flex box, which would ignore "hidden" */
 </style>
 <div id="line"></div>
 <div id="page"><div id="heading"></div><div id="text"></div></div>
