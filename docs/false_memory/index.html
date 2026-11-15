@@ -1,0 +1,134 @@
+<!doctype html>
+<!-- Web version of false_memory.py: same steps, same material (material.json), same data columns.
+     Layout copies expyriment: black screen, grey text (150,150,150), text size = screen height / 40,
+     word size = screen height / 12, text screens in a box of 80 % of the screen with the text
+     starting at 1/5 of the box. The font is the browser's Helvetica/Arial (expyriment: FreeSans). -->
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Listes de mots / Word lists</title>
+<style>
+  html, body { height: 100%; margin: 0; overflow: hidden; background: #000; color: rgb(150, 150, 150);
+               font-family: Helvetica, Arial, sans-serif; font-size: max(20px, 2.5vh); cursor: none; }
+  #line { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  #page { position: absolute; left: 10vw; top: 10vh; width: 80vw; height: 80vh; text-align: center; }
+  #heading { font-size: 1.3em; }
+  #text { position: absolute; top: 20%; width: 100%; white-space: pre-line; }
+  .word { font-size: calc(100vh / 12); }
+  a { color: inherit; }
+</style>
+<div id="line"></div>
+<div id="page"><div id="heading"></div><div id="text"></div></div>
+<script>
+// Experiment ID given by https://pipe.jspsych.org (it stores each run in your OSF project).
+// Empty: nothing is sent and the participant is offered the data file as a download.
+const DATAPIPE_ID = "";
+
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+const painted = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+function line(text, cls = "") {            // like stimuli.TextLine(...).present(); "" = blank screen
+  $("page").hidden = true; $("line").hidden = false;
+  $("line").className = cls; $("line").textContent = text;
+}
+function page(heading, text) {             // like stimuli.TextScreen(heading, text).present()
+  $("line").hidden = true; $("page").hidden = false;
+  $("heading").textContent = heading; $("text").textContent = text;
+}
+async function key(allowed) {              // like exp.keyboard.wait(keys): returns [key, ms]
+  await painted();
+  const start = performance.now();
+  return new Promise(resolve => addEventListener("keydown", function handler(event) {
+    const k = event.key.toLowerCase();
+    if (allowed && !allowed.includes(k)) return;
+    removeEventListener("keydown", handler);
+    resolve([k, Math.round(performance.now() - start)]);
+  }));
+}
+function shuffle(a) {                      // Fisher-Yates, as random.shuffle
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function makeTest(M, lists, studied) {     // same as make_test() in false_memory.py
+  const items = [];
+  for (const [lure, words] of Object.entries(lists)) {
+    const group = studied.includes(lure) ? "studied" : "unstudied";
+    for (const p of M.test_positions) items.push([words[p - 1], lure, group + "_word"]);
+    items.push([lure, lure, group + "_lure"]);
+  }
+  return shuffle(items);
+}
+
+async function run() {
+  const M = await (await fetch("material.json")).json();
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const rows = [];
+
+  page("", M.choose);
+  const language = (await key(["f", "e"]))[0] === "f" ? "fr" : "en";
+  document.documentElement.requestFullscreen?.().catch(() => {});
+  const T = M[language];
+  const lists = Object.fromEntries(Object.entries(T.lists).map(([lure, w]) => [lure, w.split(" ")]));
+  const check = makeTest(M, lists, Object.keys(lists).slice(0, 6));
+  console.assert(check.length === 48 && check.filter(i => i[2] === "studied_lure").length === 6);
+
+  page(...T.study);
+  await key();
+
+  const studied = shuffle(Object.keys(lists)).slice(0, 6);
+  for (const [n, lure] of studied.entries()) {
+    line(T.list.replace("{}", n + 1).replace("{}", studied.length));
+    await sleep(M.list_pause_ms);
+    for (const word of lists[lure]) {
+      line(word, "word");
+      await sleep(M.word_ms);
+      line("");
+      await sleep(M.gap_ms);
+      rows.push([id, "study", word, lure, "studied_word", "", ""]);
+    }
+  }
+
+  page(...T.test);
+  await key();
+
+  for (const [word, lure, kind] of makeTest(M, lists, studied)) {
+    line("");
+    await sleep(M.test_blank_ms);
+    line(word, "word");
+    const [k, rt] = await key(["f", "j"]);
+    rows.push([id, "test", word, lure, kind, k === "f" ? "True" : "False", rt]);
+  }
+
+  // Same layout as expyriment's .xpd file: comment lines, a header line, one line per event.
+  const data = [`#e language: ${language}`, "#e source: web", `#date: ${new Date().toISOString()}`,
+                `#screen: ${screen.width}x${screen.height}`, `#browser: ${navigator.userAgent}`,
+                "subject_id,phase,word,list,kind,said_old,rt",
+                ...rows.map(r => r.join(","))].join("\n") + "\n";
+  const filename = `false_memory_web_${id}.xpd`;
+  page("", T.saving);
+  let sent = false;
+  if (DATAPIPE_ID) {
+    try {
+      sent = (await fetch("https://pipe.jspsych.org/api/data/", {
+        method: "POST", headers: { "Content-Type": "application/json", Accept: "*/*" },
+        body: JSON.stringify({ experimentID: DATAPIPE_ID, filename, data }),
+      })).ok;
+    } catch (error) { /* offline or blocked: fall through to the download */ }
+  }
+  document.exitFullscreen?.().catch(() => {});
+  document.body.style.cursor = "auto";
+  page(T.end, sent ? T.saved : "");
+  if (!sent) {
+    const link = Object.assign(document.createElement("a"), {
+      href: URL.createObjectURL(new Blob([data], { type: "text/plain" })),
+      download: filename, textContent: T.download });
+    $("text").append(link);
+  }
+}
+run();
+</script>
+</html>

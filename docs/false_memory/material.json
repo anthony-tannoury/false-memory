@@ -1,0 +1,70 @@
+{
+ "word_ms": 1500,
+ "gap_ms": 250,
+ "list_pause_ms": 3000,
+ "test_blank_ms": 500,
+ "test_positions": [
+  1,
+  8,
+  10
+ ],
+ "choose": "Français : appuyez sur F\n\nEnglish: press E",
+ "en": {
+  "lists": {
+   "sleep": "bed rest awake tired dream wake snooze blanket doze slumber snore nap peace yawn drowsy",
+   "chair": "table sit legs seat couch desk recliner sofa wood cushion swivel stool sitting rocking bench",
+   "needle": "thread pin eye sewing sharp point prick thimble haystack thorn hurt injection syringe cloth knitting",
+   "sweet": "sour candy sugar bitter good taste tooth nice honey soda chocolate heart cake tart pie",
+   "mountain": "hill valley climb summit top molehill peak plain glacier goat bike climber range steep ski",
+   "doctor": "nurse sick lawyer medicine health hospital dentist physician ill patient office stethoscope surgeon clinic cure",
+   "cold": "hot snow warm winter ice wet frigid chilly heat weather freeze air shiver arctic frost",
+   "rough": "smooth bumpy road tough sandpaper jagged ready coarse uneven riders rugged sand boards ground gravel",
+   "window": "door glass pane shade ledge sill house open curtain frame view breeze sash screen shutter",
+   "anger": "mad fear hate rage temper fury ire wrath happy fight hatred mean calm emotion enrage",
+   "bread": "butter food eat sandwich rye jam milk flour jelly dough crust slice wine loaf toast",
+   "music": "note sound piano sing radio band melody horn concert instrument symphony jazz orchestra art rhythm"
+  },
+  "study": [
+   "Word lists",
+   "You will see several lists of English words, one word at a time.\nRead each word carefully and try to remember it: your memory will be tested afterwards.\n\nPress a key to start."
+  ],
+  "list": "List {} of {}",
+  "test": [
+   "Memory test",
+   "Words will appear one at a time.\n\nF: this word WAS in one of the lists\nJ: this word was NOT in the lists\n\nThere is no time limit. Press a key to start."
+  ],
+  "end": "Thank you!",
+  "saving": "Saving your answers...",
+  "saved": "Your answers are saved. Thank you! You can close this page.",
+  "download": "Your answers could not be sent. Please click here to download the file, and send it to the person who gave you this link."
+ },
+ "fr": {
+  "lists": {
+   "dormir": "lit repos éveillé fatigué rêve réveil somme couverture somnoler assoupi ronfler sieste paix bâiller engourdi",
+   "chaise": "table asseoir pieds siège canapé bureau fauteuil sofa bois coussin pivotant tabouret assis bascule banc",
+   "aiguille": "fil épingle chas coudre pointu pointe piquer dé foin épine douleur injection seringue tissu tricot",
+   "montagne": "colline vallée grimper sommet haut taupinière pic plaine glacier chèvre vélo alpiniste chaîne raide ski",
+   "docteur": "infirmière malade avocat médicament santé hôpital dentiste médecin souffrant patient cabinet stéthoscope chirurgien clinique guérir",
+   "froid": "chaud neige tiède hiver glace mouillé glacial frais chaleur météo geler air frisson arctique givre",
+   "fenêtre": "porte verre vitre store rebord appui maison ouvrir rideau cadre vue brise châssis moustiquaire volet",
+   "colère": "fâché peur détester rage humeur fureur ire courroux heureux bagarre haine méchant calme émotion enrager",
+   "pain": "beurre nourriture manger sandwich seigle confiture lait farine gelée pâte croûte tranche vin miche toast",
+   "musique": "note son piano chanter radio groupe mélodie cor concert instrument symphonie jazz orchestre art rythme",
+   "araignée": "toile insecte bestiole terreur mouche arachnide ramper tarentule poison morsure effrayant animal laid antennes petit",
+   "lent": "rapide léthargique arrêt apathique escargot prudent retard embouteillage tortue hésitant vitesse vite paresseux attendre mélasse"
+  },
+  "study": [
+   "Listes de mots",
+   "Vous allez voir plusieurs listes de mots, un mot à la fois.\nLisez chaque mot attentivement et essayez de le retenir : votre mémoire sera testée ensuite.\n\nAppuyez sur une touche pour commencer."
+  ],
+  "list": "Liste {} sur {}",
+  "test": [
+   "Test de mémoire",
+   "Des mots vont apparaître un par un.\n\nF : ce mot ÉTAIT dans une des listes\nJ : ce mot n'était PAS dans les listes\n\nLe temps n'est pas limité. Appuyez sur une touche pour commencer."
+  ],
+  "end": "Merci !",
+  "saving": "Enregistrement de vos réponses...",
+  "saved": "Vos réponses sont enregistrées. Merci ! Vous pouvez fermer cette page.",
+  "download": "Vos réponses n'ont pas pu être envoyées. Cliquez ici pour télécharger le fichier, puis envoyez-le à la personne qui vous a donné ce lien."
+ }
+}
