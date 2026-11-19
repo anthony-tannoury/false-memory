@@ -20,3 +20,11 @@ The experiment takes about 4 minutes, in French or English.
 
 The English lists are from the paper's appendix. The French lists are a
 translation of them, not published French norms.
+
+## Analyse
+
+```
+python analyze.py <dossier des fichiers .xpd> <dossier de sortie>
+```
+
+Writes, for each graph, a `.csv` with the plotted values and a `.png` image.
