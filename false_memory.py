@@ -56,6 +56,25 @@ def make_test(lists, studied):
     return items
 
 
+def results(answers):
+    """Values for the end screen, from the test answers (word, list, kind, said_old)."""
+    values = {}
+    for name, kinds in (("hits", {"studied_word"}), ("lures", {"studied_lure"}),
+                        ("fa", {"unstudied_word", "unstudied_lure"})):
+        said = [a[3] for a in answers if a[2] in kinds]
+        values[name], values["n_" + name] = sum(said), len(said)
+        values["p_" + name] = int(100 * sum(said) / len(said) + 0.5)   # same rounding as JS
+    words = [a[0] for a in answers if a[2] == "studied_lure" and a[3]]
+    values["lure_words"] = f"({', '.join(words)})" if words else ""
+    return values
+
+
+assert results([("bed", "sleep", "studied_word", True), ("rest", "sleep", "studied_word", False),
+                ("sleep", "sleep", "studied_lure", True), ("hot", "cold", "unstudied_word", False),
+                ("cold", "cold", "unstudied_lure", True)]) == {
+    "hits": 1, "n_hits": 2, "p_hits": 50, "lures": 1, "n_lures": 1, "p_lures": 100,
+    "fa": 1, "n_fa": 2, "p_fa": 50, "lure_words": "(sleep)"}
+
 for _lang in ("en", "fr"):
     _lists = {lure: words.split() for lure, words in M[_lang]["lists"].items()}
     _words = [w for lure, words in _lists.items() for w in words + [lure]]
@@ -105,11 +124,17 @@ for number, lure in enumerate(studied, 1):
 stimuli.TextScreen(*TEXT["test"]).present()
 exp.keyboard.wait()
 
+answers = []
 for word, lure, kind in make_test(LISTS, set(studied)):
     blank.present()
     wait(M["test_blank_ms"])
     stimuli.TextLine(word, text_size=WORD_SIZE).present()
     key, rt = exp.keyboard.wait([OLD, NEW])
     exp.data.add(["test", word, lure, kind, key == OLD, rt])
+    answers.append((word, lure, kind, key == OLD))
+exp.data.save()
+
+stimuli.TextScreen(TEXT["results"][0], TEXT["results"][1].format(**results(answers))).present()
+exp.keyboard.wait()
 
 control.end(goodbye_text=TEXT["end"])

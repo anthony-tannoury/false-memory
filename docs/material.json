@@ -36,7 +36,11 @@
   "end": "Thank you!",
   "saving": "Saving your answers...",
   "saved": "Your answers are saved. Thank you! You can close this page.",
-  "download": "Your answers could not be sent. Please click here to download the file, and send it to the person who gave you this link."
+  "download": "Your answers could not be sent. Please click here to download the file, and send it to the person who gave you this link.",
+  "results": [
+   "Your results",
+   "Lists you read\nWords that were in the lists: recognised {hits} of {n_hits} ({p_hits} %)\n-> correct recognitions (true positives)\nKey words never shown, related to the themes of the lists: \"recognised\" {lures} of {n_lures} ({p_lures} %)\n-> false memories (false positives)\n{lure_words}\n\nLists you did not read\nWords from these lists: \"recognised\" {fa} of {n_fa} ({p_fa} %) -> false positives\n\nEach list was built around a key word that was never shown. If you \"recognised\" it, your memory kept the theme of the list and rebuilt that word: this is a false memory.\n\nPress a key to finish."
+  ]
  },
  "fr": {
   "lists": {
@@ -65,6 +69,10 @@
   "end": "Merci !",
   "saving": "Enregistrement de vos réponses...",
   "saved": "Vos réponses sont enregistrées. Merci ! Vous pouvez fermer cette page.",
-  "download": "Vos réponses n'ont pas pu être envoyées. Cliquez ici pour télécharger le fichier, puis envoyez-le à la personne qui vous a donné ce lien."
+  "download": "Vos réponses n'ont pas pu être envoyées. Cliquez ici pour télécharger le fichier, puis envoyez-le à la personne qui vous a donné ce lien.",
+  "results": [
+   "Vos résultats",
+   "Listes que vous avez lues\nMots qui étaient dans les listes : reconnus {hits} sur {n_hits} ({p_hits} %)\n-> bonnes reconnaissances (vrais positifs)\nMots clés jamais montrés, liés au thème des listes : « reconnus » {lures} sur {n_lures} ({p_lures} %)\n-> faux souvenirs (faux positifs)\n{lure_words}\n\nListes que vous n'avez pas lues\nMots de ces listes : « reconnus » {fa} sur {n_fa} ({p_fa} %) -> faux positifs\n\nChaque liste était construite autour d'un mot clé qui n'était jamais montré. Si vous l'avez « reconnu », votre mémoire a retenu le thème de la liste et a reconstruit ce mot : c'est un faux souvenir.\n\nAppuyez sur une touche pour terminer."
+  ]
  }
 }

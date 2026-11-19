@@ -54,6 +54,22 @@ function shuffle(a) {                      // Fisher-Yates, as random.shuffle
   }
   return a;
 }
+function results(answers) {                // same as results() in false_memory.py
+  const values = {};
+  for (const [name, kinds] of [["hits", ["studied_word"]], ["lures", ["studied_lure"]],
+                               ["fa", ["unstudied_word", "unstudied_lure"]]]) {
+    const said = answers.filter(a => kinds.includes(a[2])).map(a => a[3]);
+    const yes = said.filter(Boolean).length;
+    Object.assign(values, { [name]: yes, ["n_" + name]: said.length,
+                            ["p_" + name]: Math.round(100 * yes / said.length) });
+  }
+  const words = answers.filter(a => a[2] === "studied_lure" && a[3]).map(a => a[0]);
+  values.lure_words = words.length ? `(${words.join(", ")})` : "";
+  return values;
+}
+console.assert(JSON.stringify(results([["bed", "sleep", "studied_word", true], ["rest", "sleep", "studied_word", false],
+  ["sleep", "sleep", "studied_lure", true], ["hot", "cold", "unstudied_word", false], ["cold", "cold", "unstudied_lure", true]]))
+  === '{"hits":1,"n_hits":2,"p_hits":50,"lures":1,"n_lures":1,"p_lures":100,"fa":1,"n_fa":2,"p_fa":50,"lure_words":"(sleep)"}');
 function makeTest(M, lists, studied) {     // same as make_test() in false_memory.py
   const items = [];
   for (const [lure, words] of Object.entries(lists)) {
@@ -96,12 +112,14 @@ async function run() {
   page(...T.test);
   await key();
 
+  const answers = [];
   for (const [word, lure, kind] of makeTest(M, lists, studied)) {
     line("");
     await sleep(M.test_blank_ms);
     line(word, "word");
     const [k, rt] = await key(["f", "j"]);
     rows.push([id, "test", word, lure, kind, k === "f" ? "True" : "False", rt]);
+    answers.push([word, lure, kind, k === "f"]);
   }
 
   // Same layout as expyriment's .xpd file: comment lines, a header line, one line per event.
@@ -110,16 +128,16 @@ async function run() {
                 "subject_id,phase,word,list,kind,said_old,rt",
                 ...rows.map(r => r.join(","))].join("\n") + "\n";
   const filename = `false_memory_web_${id}.xpd`;
+  // Send now, while the participant reads the results, so closing the page then loses nothing.
+  const sending = !DATAPIPE_ID ? Promise.resolve(false) : fetch("https://pipe.jspsych.org/api/data/", {
+    method: "POST", headers: { "Content-Type": "application/json", Accept: "*/*" },
+    body: JSON.stringify({ experimentID: DATAPIPE_ID, filename, data }),
+  }).then(response => response.ok, () => false);   // offline or blocked: offer the download
+  const values = results(answers);
+  page(T.results[0], T.results[1].replace(/\{(\w+)\}/g, (_, name) => values[name]));
+  await key();
   page("", T.saving);
-  let sent = false;
-  if (DATAPIPE_ID) {
-    try {
-      sent = (await fetch("https://pipe.jspsych.org/api/data/", {
-        method: "POST", headers: { "Content-Type": "application/json", Accept: "*/*" },
-        body: JSON.stringify({ experimentID: DATAPIPE_ID, filename, data }),
-      })).ok;
-    } catch (error) { /* offline or blocked: fall through to the download */ }
-  }
+  const sent = await sending;
   document.exitFullscreen?.().catch(() => {});
   document.body.style.cursor = "auto";
   page(T.end, sent ? T.saved : "");
