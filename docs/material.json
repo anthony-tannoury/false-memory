@@ -2,7 +2,7 @@
  "version": 2,
  "n_lists": 8,
  "list_length": 12,
- "word_ms": 1000,
+ "word_ms": 1500,
  "gap_ms": 250,
  "list_pause_ms": 3000,
  "test_blank_ms": 500,
