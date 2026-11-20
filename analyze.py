@@ -27,7 +27,7 @@ matplotlib.use("Agg")                      # write image files, no window
 import matplotlib.pyplot as plt
 
 KINDS = ["studied_word", "studied_lure", "unstudied_word", "unstudied_lure"]
-N_TEST = 48
+N_TEST = {"1": 48, "2": 32}    # test words per version (version 1 files have no version line)
 BLUE, ORANGE, GREY, INK = "#2a78d6", "#eb6834", "#888780", "#0b0b0b"
 GRAPH1 = [  # (type de mot, étiquette, couleur, valeurs de l'article)
     ("studied_word", "Listes lues :\nmots montrés", BLUE, (0.65, 0.79)),
@@ -42,10 +42,11 @@ def read_xpd(path):
     language = next((l.split(":")[1].strip() for l in lines if l.startswith("#e language:")), "?")
     rows = list(csv.DictReader(l for l in lines if not l.startswith("#")))
     test = [r for r in rows if r.get("phase") == "test"]
-    if len(test) != N_TEST:
+    version = next((l.split(":")[1].strip() for l in lines if l.startswith("#e version:")), "1")
+    if len(test) != N_TEST.get(version):
         return None
     source = "web" if any(l.startswith("#e source: web") for l in lines) else "python"
-    return {"participant": path.stem, "language": language, "source": source, "test": test}
+    return {"participant": path.stem, "language": language, "version": version, "source": source, "test": test}
 
 
 def summarise(p):
@@ -96,9 +97,9 @@ for path in sorted(source_dir.glob("*.xpd")):
         people.append(summarise(run))
 if not people:
     sys.exit(f"aucun fichier complet dans {source_dir}")
-print(f"{len(people)} participant(s) : "
-      + ", ".join(f"{lang} {sum(p['language'] == lang for p in people)}"
-                  for lang in sorted({p['language'] for p in people})))
+for field in ("language", "version"):
+    print(f"{len(people)} participant(s), {field} : "
+          + ", ".join(f"{v} {sum(p[field] == v for p in people)}" for v in sorted({p[field] for p in people})))
 
 # 1. Taux de « oui » par type de mot
 rows = []

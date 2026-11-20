@@ -15,9 +15,9 @@ The word lists, the texts and the durations are in docs/material.json.
 The web page docs/index.html reads the same file and follows the
 same steps, so both versions show the same thing.
 
-From the paper: 15 words per list in the appendix order, about 1.5 s per word;
-the test takes the words at positions 1, 8 and 10 of every list plus its
-missing word, for studied and non-studied lists. The English lists are 12 of
+From the paper: words in the appendix order; the test takes the words at
+positions 1, 8 and 10 of every list plus its missing word, for studied and
+non-studied lists. The English lists are 12 of
 the 24 lists of the paper's appendix, checked word by word against it.
 
 NOT from the paper (check before collecting data):
@@ -29,8 +29,12 @@ NOT from the paper (check before collecting data):
   equivalent). Words that are idioms in English (molehill, haystack) lose
   their link in French.
 - The paper played the words on a tape recorder; here they are shown on screen.
-- The paper used 24 lists (16 studied) and 2 min of recall or arithmetic after
-  each list; here 12 lists (6 studied) and no task between lists.
+- Shorter session (version 2, set in docs/material.json): each person gets 8 of
+  the 12 lists, drawn at random (4 studied, 4 not), the first 12 words of each
+  list (Experiment 2 used 15; Experiment 1 of the same paper used 12) and 1 s
+  per word (the paper: about 1.5 s). The paper used 24 lists (16 studied) and
+  2 min of recall or arithmetic after each list; here no task between lists.
+  Version 1 (12 lists of 15 words, 6 studied, 1.5 s) gave 48 test words instead of 32.
 - The paper's test also asked for remember / know judgements; here old / new only.
 """
 import json
@@ -80,8 +84,10 @@ for _lang in ("en", "fr"):
     _words = [w for lure, words in _lists.items() for w in words + [lure]]
     assert len(_lists) == 12 and all(len(words) == 15 for words in _lists.values())
     assert len(_words) == len(set(_words)), "a word appears twice"
-    _test = make_test(_lists, set(list(_lists)[:6]))
-    assert len(_test) == 48 and sum(kind == "studied_lure" for _, _, kind in _test) == 6
+    _short = {lure: words[:M["list_length"]] for lure, words in list(_lists.items())[:M["n_lists"]]}
+    _test = make_test(_short, set(list(_short)[:M["n_lists"] // 2]))
+    assert len(_test) == 4 * M["n_lists"] and sum(k == "studied_lure" for _, _, k in _test) == M["n_lists"] // 2
+assert max(M["test_positions"]) <= M["list_length"]
 
 control.set_develop_mode("--dev" in sys.argv)
 exp = design.Experiment("false_memory")
@@ -104,8 +110,10 @@ stimuli.TextScreen("", M["choose"]).present()
 key, _ = exp.keyboard.wait(list(LANGUAGE_KEYS))
 language = LANGUAGE_KEYS[key]
 exp.data.add_experiment_info(f"language: {language}")
+exp.data.add_experiment_info(f"version: {M['version']}")
 TEXT = M[language]
-LISTS = {lure: words.split() for lure, words in TEXT["lists"].items()}
+chosen = random.sample(list(TEXT["lists"]), M["n_lists"])    # a different set of lists for each person
+LISTS = {lure: TEXT["lists"][lure].split()[:M["list_length"]] for lure in chosen}
 
 stimuli.TextScreen(*TEXT["study"]).present()
 exp.keyboard.wait()

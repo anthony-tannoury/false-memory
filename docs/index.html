@@ -89,14 +89,15 @@ async function run() {
   const language = (await key(["f", "e"]))[0] === "f" ? "fr" : "en";
   document.documentElement.requestFullscreen?.().catch(() => {});
   const T = M[language];
-  const lists = Object.fromEntries(Object.entries(T.lists).map(([lure, w]) => [lure, w.split(" ")]));
-  const check = makeTest(M, lists, Object.keys(lists).slice(0, 6));
-  console.assert(check.length === 48 && check.filter(i => i[2] === "studied_lure").length === 6);
+  const chosen = shuffle(Object.keys(T.lists)).slice(0, M.n_lists);   // a different set of lists for each person
+  const lists = Object.fromEntries(chosen.map(lure => [lure, T.lists[lure].split(" ").slice(0, M.list_length)]));
+  const check = makeTest(M, lists, chosen.slice(0, M.n_lists / 2));
+  console.assert(check.length === 4 * M.n_lists && check.filter(i => i[2] === "studied_lure").length === M.n_lists / 2);
 
   page(...T.study);
   await key();
 
-  const studied = shuffle(Object.keys(lists)).slice(0, 6);
+  const studied = shuffle(Object.keys(lists)).slice(0, M.n_lists / 2);
   for (const [n, lure] of studied.entries()) {
     line(T.list.replace("{}", n + 1).replace("{}", studied.length));
     await sleep(M.list_pause_ms);
@@ -123,7 +124,7 @@ async function run() {
   }
 
   // Same layout as expyriment's .xpd file: comment lines, a header line, one line per event.
-  const data = [`#e language: ${language}`, "#e source: web", `#date: ${new Date().toISOString()}`,
+  const data = [`#e language: ${language}`, `#e version: ${M.version}`, "#e source: web", `#date: ${new Date().toISOString()}`,
                 `#screen: ${screen.width}x${screen.height}`, `#browser: ${navigator.userAgent}`,
                 "subject_id,phase,word,list,kind,said_old,rt",
                 ...rows.map(r => r.join(","))].join("\n") + "\n";

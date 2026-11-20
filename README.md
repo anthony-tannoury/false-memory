@@ -16,7 +16,7 @@ words not presented in lists*, J. Exp. Psychol. LMC 21:803-814, Experiment 2.
   python false_memory.py
   ```
 
-The experiment takes about 4 minutes, in French or English.
+The experiment takes about 2½ minutes, in French or English.
 
 The English lists are from the paper's appendix. The French lists are a
 translation of them, not published French norms.
